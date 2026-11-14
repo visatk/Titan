@@ -19,12 +19,12 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "$npm_execpath run build && vite preview",
-    "deploy": "$npm_execpath run build && wrangler deploy",
+    "deploy": "npm run db:migrate:remote && npm run build && wrangler deploy",
     "cf-typegen": "wrangler types --env-interface CloudflareBindings",
     "db:migrate:local": "wrangler d1 migrations apply bin-database --local",
     "db:seed:local": "wrangler d1 execute bin-database --local --file=seed/0001_seed_bins.sql --yes",
     "db:seed:gen": "python3 scripts/generate_seed.py",
-    "db:migrate:remote": "wrangler d1 migrations apply bin-database --remote",
+    "db:migrate:remote": "wrangler d1 migrations apply steven --remote",
     "db:seed:remote": "wrangler d1 execute bin-database --remote --file=seed/0001_seed_bins.sql --yes"
   },
   "dependencies": {
