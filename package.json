@@ -1,0 +1,39 @@
+{
+  "name": "titan-bin-api",
+  "version": "1.0.0",
+  "description": "Open-source high-precision BIN/IIN lookup API, explorer, and dataset analyzer built on Cloudflare Workers, Hono, and D1.",
+  "license": "MIT",
+  "type": "module",
+  "keywords": [
+    "bin-lookup",
+    "iin-lookup",
+    "bin-database",
+    "cloudflare-workers",
+    "cloudflare-d1",
+    "hono",
+    "fintech",
+    "payment-routing",
+    "openapi"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "$npm_execpath run build && vite preview",
+    "deploy": "$npm_execpath run build && wrangler deploy",
+    "cf-typegen": "wrangler types --env-interface CloudflareBindings",
+    "db:migrate:local": "wrangler d1 migrations apply bin-database --local",
+    "db:seed:local": "wrangler d1 execute bin-database --local --file=seed/0001_seed_bins.sql --yes",
+    "db:seed:gen": "python3 scripts/generate_seed.py",
+    "db:migrate:remote": "wrangler d1 migrations apply bin-database --remote",
+    "db:seed:remote": "wrangler d1 execute bin-database --remote --file=seed/0001_seed_bins.sql --yes"
+  },
+  "dependencies": {
+    "hono": "^4.13.16"
+  },
+  "devDependencies": {
+    "@cloudflare/vite-plugin": "^1.44.0",
+    "vite": "^8.1.4",
+    "vite-ssr-components": "^0.8.0",
+    "wrangler": "^4.110.0"
+  }
+}

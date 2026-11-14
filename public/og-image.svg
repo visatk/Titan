@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#070b16"/>
+      <stop offset="100%" stop-color="#111a33"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#60a5fa"/>
+      <stop offset="100%" stop-color="#34d399"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect x="64" y="64" width="1072" height="502" rx="24" fill="#0d1428" stroke="#243254" stroke-width="2"/>
+  <rect x="112" y="120" width="190" height="36" rx="18" fill="#172546" stroke="#2e4478"/>
+  <text x="207" y="144" font-family="ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="700" fill="#60a5fa" text-anchor="middle">OPEN SOURCE · MIT</text>
+  <text x="112" y="226" font-family="ui-sans-serif, system-ui, sans-serif" font-size="60" font-weight="800" fill="#f8fafc">Titan BIN Lookup API</text>
+  <text x="112" y="286" font-family="ui-sans-serif, system-ui, sans-serif" font-size="28" fill="#94a3b8">6 to 11-Digit Waterfall Card &amp; Issuer Intelligence on Cloudflare D1</text>
+  <rect x="112" y="340" width="976" height="4" rx="2" fill="url(#accent)"/>
+  <g font-family="ui-monospace, monospace" font-size="22" fill="#cbd5e1">
+    <text x="112" y="410">11 → 10 → 9 → 8 → 6 Waterfall</text>
+    <text x="112" y="454">10,000 BINs · 89 Brands · 180 Countries</text>
+    <text x="112" y="498">REST API · Batch Lookup · OpenAPI 3.1</text>
+  </g>
+</svg>

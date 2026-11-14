@@ -1,0 +1,153 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Titan BIN Lookup API",
+    "version": "1.0.0",
+    "description": "Open-source Bank Identification Number (BIN/IIN) lookup API powered by Cloudflare Workers, Hono, and D1. Supports 6 to 11-digit descending waterfall lookups, batch lookups, multi-attribute search, and live dataset analytics.",
+    "license": {
+      "name": "MIT",
+      "url": "https://opensource.org/licenses/MIT"
+    }
+  },
+  "paths": {
+    "/api/health": {
+      "get": {
+        "summary": "Health Check",
+        "description": "Returns API health status and loaded D1 record count.",
+        "responses": {
+          "200": {
+            "description": "Healthy response with record count"
+          }
+        }
+      }
+    },
+    "/api/lookup/{pan}": {
+      "get": {
+        "summary": "Waterfall BIN / PAN Lookup",
+        "description": "Strips non-digit characters and executes a descending waterfall lookup (11 -> 10 -> 9 -> 8 -> 6 digits).",
+        "parameters": [
+          {
+            "name": "pan",
+            "in": "path",
+            "required": true,
+            "description": "6 to 19 digit BIN prefix or card PAN",
+            "schema": { "type": "string", "example": "50612402005" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Matched BIN record and metadata" },
+          "400": { "description": "Fewer than 6 numeric digits provided" },
+          "404": { "description": "No matching BIN found in database" }
+        }
+      }
+    },
+    "/api/lookup": {
+      "get": {
+        "summary": "Query-String Waterfall BIN Lookup",
+        "description": "Waterfall lookup accepting ?bin= or ?pan= query parameter.",
+        "parameters": [
+          {
+            "name": "bin",
+            "in": "query",
+            "required": false,
+            "description": "BIN prefix (6-11 digits)",
+            "schema": { "type": "string", "example": "010309" }
+          },
+          {
+            "name": "pan",
+            "in": "query",
+            "required": false,
+            "description": "Full card PAN (6-19 digits)",
+            "schema": { "type": "string", "example": "4229989881234567" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Matched BIN record" },
+          "400": { "description": "Missing or invalid BIN/PAN parameter" },
+          "404": { "description": "No matching BIN found" }
+        }
+      }
+    },
+    "/api/lookup/batch": {
+      "post": {
+        "summary": "Batch Waterfall Lookup",
+        "description": "Performs deduplicated waterfall lookups for 1 to 100 BINs/PANs in a single request.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["bins"],
+                "properties": {
+                  "bins": {
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 100,
+                    "items": { "type": "string" },
+                    "example": ["50612402005", "400052009999", "010309"]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Batch lookup results array" },
+          "400": { "description": "Invalid JSON or out-of-range batch size" }
+        }
+      }
+    },
+    "/api/bins": {
+      "get": {
+        "summary": "Search & Filter BINs",
+        "description": "Paginated search across BIN attributes and fintech payout capabilities.",
+        "parameters": [
+          { "name": "prefix", "in": "query", "schema": { "type": "string" }, "description": "BIN starts-with prefix" },
+          { "name": "brand", "in": "query", "schema": { "type": "string" }, "description": "Card network (e.g. VISA, MASTERCARD)" },
+          { "name": "type", "in": "query", "schema": { "type": "string" }, "description": "CREDIT, DEBIT, or CHARGE CARD" },
+          { "name": "category", "in": "query", "schema": { "type": "string" }, "description": "Card tier (e.g. PLATINUM, CLASSIC)" },
+          { "name": "segment", "in": "query", "schema": { "type": "string" }, "description": "PERSONAL or COMMERCIAL" },
+          { "name": "country", "in": "query", "schema": { "type": "string" }, "description": "Full country name" },
+          { "name": "iso2", "in": "query", "schema": { "type": "string" }, "description": "ISO 3166-1 alpha-2 code (e.g. US, GB, NA)" },
+          { "name": "bank", "in": "query", "schema": { "type": "string" }, "description": "Partial issuer bank name match" },
+          { "name": "currency", "in": "query", "schema": { "type": "string" }, "description": "Normalized ISO 4217 alpha-3 currency (e.g. USD)" },
+          { "name": "bin_length", "in": "query", "schema": { "type": "integer" }, "description": "Exact BIN digit length (6, 8, 9, 10, 11)" },
+          { "name": "regulated", "in": "query", "schema": { "type": "boolean" }, "description": "US Durbin regulated indicator" },
+          { "name": "fast_funds_dom", "in": "query", "schema": { "type": "boolean" }, "description": "Domestic Fast Funds support" },
+          { "name": "fast_funds_cross", "in": "query", "schema": { "type": "boolean" }, "description": "Cross-border Fast Funds support" },
+          { "name": "push_funds", "in": "query", "schema": { "type": "boolean" }, "description": "Push-to-card support" },
+          { "name": "moneysend", "in": "query", "schema": { "type": "boolean" }, "description": "Mastercard MoneySend indicator" },
+          { "name": "visa_direct", "in": "query", "schema": { "type": "boolean" }, "description": "Visa Direct / Money Transfer indicator" },
+          { "name": "token", "in": "query", "schema": { "type": "boolean" }, "description": "Digital wallet tokenized range" },
+          { "name": "pull_dom", "in": "query", "schema": { "type": "boolean" }, "description": "Domestic pull-funds support" },
+          { "name": "comm_l2", "in": "query", "schema": { "type": "boolean" }, "description": "Commercial Level 2 data support" },
+          { "name": "comm_l3", "in": "query", "schema": { "type": "boolean" }, "description": "Commercial Level 3 data support" },
+          { "name": "limit", "in": "query", "schema": { "type": "integer", "default": 25, "maximum": 100 } },
+          { "name": "offset", "in": "query", "schema": { "type": "integer", "default": 0 } }
+        ],
+        "responses": {
+          "200": { "description": "Paginated matching BIN records" }
+        }
+      }
+    },
+    "/api/stats": {
+      "get": {
+        "summary": "Live Database Statistics",
+        "description": "Aggregated counts across BIN precision lengths, brands, countries, issuers, currencies, and capabilities.",
+        "responses": {
+          "200": { "description": "Aggregated dataset statistics" }
+        }
+      }
+    },
+    "/api/analysis": {
+      "get": {
+        "summary": "Dataset Audit & Normalization Report",
+        "description": "Documents README vs. CSV discrepancies, null rates, prefix collisions, and data quality normalizations.",
+        "responses": {
+          "200": { "description": "Audit and data quality report" }
+        }
+      }
+    }
+  }
+}
